@@ -62,8 +62,9 @@ export class Table {
             filteredData = this._data.filter(r => r[0] !== id)
 
         this._setData(filteredData, true)
+        this._removeRow(id, index)
 
-        this._refresh()
+        this._dataChange = true
     }
 
     removeFilter(key){
@@ -83,13 +84,7 @@ export class Table {
     rowById(id){
         const rows = this._getRows()
 
-        return rows.filter(r => r[0] === id)[0]
-    }
-
-    rowsFilter(key){
-        const rows = this._getRows()
-        const filteredData = rows.filter(r => r.some(x => x === key))
-        return filteredData
+        return rows.filter(r => r.children[0].innerHTML == id)[0]
     }
 
     set(data){
@@ -131,6 +126,11 @@ export class Table {
         else  
             this._source.row.add(data).draw(false)  
     }
+
+    _adjust(){
+        this._source.columns.adjust().draw()
+    }
+
     _createRoot(data, config, create){
         this._data = data
         this._config = getConfig(data, config)
@@ -163,8 +163,8 @@ export class Table {
        
             let rows = []
     
-            this._source.rows().every(function(){
-               const data = this.data()
+            this._source.rows().every(function(x){
+                const data = this.node()
                 rows.push(data)
             })
     
@@ -173,6 +173,27 @@ export class Table {
         }
 
         return this._rows
+    }
+    
+    _refresh(){
+        this._source.clear()
+        this._source.rows.add(this._data)
+        this._adjust()
+    }
+    
+    //Hay que ver como se desenvuelve esto y a partir de ahí
+    //buscar otra alternativa o quedarse con esta solución.
+    _removeRow(id, index){
+        const rows = this._getRows()
+
+        index = index !== null ? index : 0
+
+        rows.forEach(row => {
+            const idInTable = row.children[index].innerHTML  
+
+            if(id == idInTable)
+                this._source.row(row).remove().draw()
+        })
     }
 
     _setData(data, newData = false){
@@ -186,16 +207,6 @@ export class Table {
         
         this._dataChange = true
         this._config.data = this._data
-    }
-
-    _refresh(){
-        this._source.clear()
-        this._source.rows.add(this._data)
-        this._adjust()
-    }
-    
-    _adjust(){
-        this._source.columns.adjust().draw()
     }
 }
 

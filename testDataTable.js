@@ -25,7 +25,10 @@ const tabla = new Table('table', data, { columns: columns })
 //Obtiene las rows de la tabla
 const rows = tabla.rows()
 const row  = tabla.rowById(4)
-const rowsContains = tabla.rowsFilter("Castellanos")
+
+console.log(row)
+
+console.log(rows)
 
 //Obtiene los datos de la tabla
 const tData = tabla.data()
@@ -33,7 +36,6 @@ const tDataId  = tabla.dataById(5)
 const tDataKey  = tabla.dataByKey('Castellanos', 2)
 const tDataFilter = tabla.dataFilter('Flores')
 
-console.log(tDataId)
 
 //Se puede añadir un solo elemento
 tabla.add([6, 'Javier', 'Chimeo', '30', 6])
@@ -48,10 +50,7 @@ tabla.add([
 tabla.remove(3)
 tabla.remove('Castellanos', 2)
 
-//También se puede remover por cualquier posición que contenga la key
-tabla.removeFilter(27) //<- Removería cada row donde alguna columna tenga 27 en INT
-
-//Esta es peligrosa si hay muchos datos en la tabla, solo es para casos MUY específicos
-//o si la tabla tiene menos de 1k registros.
-const button = (id) => `<button data-id="${id}" class="btn btn-default">Editar</button>`
-tabla.template(4, button)
+// //Esta es peligrosa si hay muchos datos en la tabla, solo es para casos MUY específicos
+// //o si la tabla tiene menos de 1k registros.
+// const button = (id) => `<button data-id="${id}" class="btn btn-default">Editar</button>`
+// tabla.template(4, button)
