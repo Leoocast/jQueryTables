@@ -19,8 +19,7 @@ export class Table {
 
     add(data){
         this._setData(data)
-
-        // this._source.row.add(data).draw(false) <-- Esta función no debería funcionar sin esto, ta raro
+        this._addRows(data)
     }
     create(){
         this._source = this.$element.DataTable(this._config)
@@ -33,11 +32,12 @@ export class Table {
        return this._data
     }
 
-    dataByKey(id, index = null){
-        if (index !== null) 
-            return this._data.filter(r => r[index] === id)
-        else 
-            return this._data.filter(r => r[0] === id)
+    dataById(id){
+        return this._data.filter(r => r[0] === id)
+    }
+
+    dataByKey(key, index){
+        return this._data.filter(r => r[index] === key)
     }
 
     dataFilter(key){
@@ -125,6 +125,12 @@ export class Table {
     }
 
     //<-------- Private --------->
+    _addRows(data){
+        if (Array.isArray(data[0])) 
+            data.forEach(row => this._source.row.add(row).draw(false))
+        else  
+            this._source.row.add(data).draw(false)  
+    }
     _createRoot(data, config, create){
         this._data = data
         this._config = getConfig(data, config)

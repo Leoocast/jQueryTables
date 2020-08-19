@@ -29,9 +29,11 @@ const rowsContains = tabla.rowsFilter("Castellanos")
 
 //Obtiene los datos de la tabla
 const tData = tabla.data()
-const tDataId  = tabla.dataByKey(5)
+const tDataId  = tabla.dataById(5)
 const tDataKey  = tabla.dataByKey('Castellanos', 2)
 const tDataFilter = tabla.dataFilter('Flores')
+
+console.log(tDataId)
 
 //Se puede añadir un solo elemento
 tabla.add([6, 'Javier', 'Chimeo', '30', 6])
@@ -39,7 +41,7 @@ tabla.add([6, 'Javier', 'Chimeo', '30', 6])
 //O un arreglo de elementos
 tabla.add([
     [7, 'Omar', 'Silva', 31, 7],
-    [8, 'Enrique', 'Montiel', 'Un chingo', 8],
+    [8, 'Enrique', 'Montiel', 'Sabe', 8],
 ])
 
 //Se puede remover por id, o por key e index
