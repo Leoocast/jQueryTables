@@ -228,10 +228,12 @@ function getConfig(data, config){
         scrollY: '300px',
         scrollCollapse: false,
         bSort: true,
-        // scrollX: true,
+        scrollX: true,
         paging: false,
         language: toSpanish(),
-        
+        deferRender: true,
+        scroller: true,
+        paging: true,
         delegateTask: false
     }
 
