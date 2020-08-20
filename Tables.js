@@ -132,7 +132,13 @@ export class Table {
         this._config = getConfig(data, config)
 
         if (create)
-            this.create()
+            if (this._config.delegateTask) 
+                setTimeout(() => {
+                    this.create()
+                }, 0)
+            else
+                this.create()
+
     }
 
     _fix(){
@@ -224,7 +230,9 @@ function getConfig(data, config){
         bSort: true,
         // scrollX: true,
         paging: false,
-        language: toSpanish()
+        language: toSpanish(),
+        
+        delegateTask: false
     }
 
     if (data !== null) 
