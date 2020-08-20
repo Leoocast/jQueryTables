@@ -1,4 +1,4 @@
-import { jQuery as $ } from './js/dataTable.js'
+import { jQuery as $ } from './src/js/dataTable.js'
 
 export class Table {
    
@@ -52,28 +52,19 @@ export class Table {
             this._source.destroy()
     }
 
-    remove(id, index = null){
+    remove(key, index = null){
 
         let filteredData = []
 
         if (index !== null) 
-            filteredData = this._data.filter(r => r[index] !== id)
+            filteredData = this._data.filter(r => r[index] !== key)
         else 
-            filteredData = this._data.filter(r => r[0] !== id)
+            filteredData = this._data.filter(r => r[0] !== key)
 
         this._setData(filteredData, true)
-        this._removeRow(id, index)
+        this._removeRow(key, index)
 
         this._dataChange = true
-    }
-
-    removeFilter(key){
-
-        const filteredData = this._data.filter(r => !r.some(x => x === key))
-
-        this._setData(filteredData, true)
-
-        this._refresh()
     }
 
     rows(){
@@ -83,12 +74,12 @@ export class Table {
 
     rowById(id){
         const rows = this._getRows()
-
         return rows.filter(r => r.children[0].innerHTML == id)[0]
     }
 
     set(data){
         if (this._source !== null) {
+            this._data = data
             this._source.destroy()
             this._config.data = data
 
@@ -132,7 +123,12 @@ export class Table {
     }
 
     _createRoot(data, config, create){
-        this._data = data
+
+        if(data === null)
+            this._data = getHtmlData(this.element)
+        else
+            this._data = data
+    
         this._config = getConfig(data, config)
 
         if (create)
@@ -183,15 +179,15 @@ export class Table {
     
     //Hay que ver como se desenvuelve esto y a partir de ahí
     //buscar otra alternativa o quedarse con esta solución.
-    _removeRow(id, index){
+    _removeRow(key, index){
         const rows = this._getRows()
 
         index = index !== null ? index : 0
 
         rows.forEach(row => {
-            const idInTable = row.children[index].innerHTML  
+            const keyInTable = row.children[index].innerHTML  
 
-            if(id == idInTable)
+            if(key == keyInTable)
                 this._source.row(row).remove().draw()
         })
     }
@@ -214,6 +210,9 @@ export class TableCheck extends Table {
     constructor(id, data = null, config = null, create = true){
         super(id, data, config, create)
     }
+
+
+
 }
 
 //Core functions ------------------------------------------------------------------------------
@@ -232,6 +231,14 @@ function getConfig(data, config){
         defaultConfig.data = data
 
     return Object.assign(defaultConfig, config)
+}
+
+function getHtmlData(table){
+    const tableRows = Array.from(table.children[1].children)
+
+    const rows = tableRows.map(r => [Array.from(r.children).map(c => c.innerHTML)][0])
+
+    return rows
 }
 
 //Core const ----------------------------------------------------------------------------------
