@@ -113,7 +113,7 @@ export class Table {
     //<-------- Private --------->
     _addRows(data){
         if (Array.isArray(data[0])) 
-            data.forEach(row => this._source.row.add(row).draw(false))
+            this._source.rows.add(data).draw(false)  
         else  
             this._source.row.add(data).draw(false)  
     }
