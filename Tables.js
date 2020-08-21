@@ -68,6 +68,11 @@ export class Table {
         this._dataChange = true
     }
 
+    removeById(id){
+        const row = this.rowById(id)
+        this._removeByRow(row, id)
+    }
+
     rows(){
         const rows = this._getRows()
         return rows
@@ -172,7 +177,7 @@ export class Table {
         if (this._dataChange) {
             if(this._source === null) return []
        
-            let rows = []
+            const rows = []
     
             this._source.rows().every(function(x){
                 const data = this.node()
@@ -185,6 +190,21 @@ export class Table {
 
         return this._rows
     }
+
+    _pipeRows(fn){
+        if(this._source === null) return []
+        
+        const rows = []
+
+        this._source.rows().every(function(x){
+            const data = this.node();
+
+            if(fn(data))
+                rows.push(data)
+        })
+
+        return rows
+    }
     
     _refresh(){
         this._source.clear()
@@ -194,6 +214,8 @@ export class Table {
     
     //Hay que ver como se desenvuelve esto y a partir de ahí
     //buscar otra alternativa o quedarse con esta solución.
+    //Update 21/08/2020 -> Ya existen los métodos removeById, _removeByRow, _removeByRows que son muy óptimos
+    //Esta solución no es adecuada pero puede funcionar en algunas situaciones, sigue siendo utlizada por remove
     _removeRow(key, index){
         const rows = this._getRows()
 
@@ -205,6 +227,22 @@ export class Table {
             if(key == keyInTable)
                 this._source.row(row).remove().draw()
         })
+    }
+
+    _removeByRow(row, id){
+        const filteredData = this._data.filter(r => r[0] !== id)
+        this._setData(filteredData, true)
+
+        this._source.row(row).remove().draw(false)
+        this._dataChange = true
+    }
+
+    _removeByRows(rows, ids){
+        const filteredData = this._data.filter(r => !ids.some(x => x === r[0]))
+        this._setData(filteredData, true)
+
+        this._source.rows(rows).remove().draw(false)
+        this._dataChange = true
     }
 
     _setData(data, newData = false){
@@ -232,10 +270,42 @@ export class TableCheck extends Table {
         if(create)
             this.create()
 
+        this._eventRowClick(this._config, this.dataById.bind(this))
+
     }
 
+    removeSelectedRows(){
+        const rows = this.selectedRows()
+        const ids = this.selectedIds()
+
+        const removed = this.selectedData().filter(r => ids.some(x => x === r[0]))
+
+        this._removeByRows(rows, ids)
+
+        return removed
+    }
+
+    selectedData(){
+        return Array.from(this._source.rows({ selected: true }).data())
+    }
+
+    selectedIds(){
+        return Array.from(this._source.rows({ selected: true }).data().map(r => r[0]))
+    }
+
+    selectedRows(){
+        const rows = this._pipeRows(r => r.classList.contains('selected'))
+        return rows
+    }
+
+    selectedRowsColumns(){
+        const rows = this.selectedRows().map(r => r.children)
+        return rows
+    }
+
+    //<-------- Private --------->
     _getCheckConfig(){
-        const checkColum = this._configColumn(0, () => '')
+        const checkColum = this._configColumn(0, (id) => `<input data-selected="false" hidden value="${id}">`)
 
         const checkMultiple = this._config.multiple === undefined ? true : this._config.multiple
 
@@ -258,9 +328,25 @@ export class TableCheck extends Table {
         return checkConfig
     }
 
+    //Pasar esto a vanilla js
+    _eventRowClick({ onSelectRow, onDeselectRow }, dataById){
+        $(this.id + ' tbody').on( 'click', 'tr td:first-child', function () {
+            const input = this.parentElement.children[0].children[0]
+            const id = input.value
+            const selected = input.dataset.selected
+            console.log(selected, id)
+            const data = dataById(parseInt(id))
 
+            console.log(data)
 
-
+            setTimeout(() => {
+                if(this.parentElement.classList.contains('selected'))
+                    onSelectRow(data)
+                else
+                    onDeselectRow(data)
+            }, 0);
+        })
+    }
 }
 
 //Core functions ------------------------------------------------------------------------------
@@ -294,6 +380,8 @@ function getHtmlData(table){
 }
 
 //Core const ----------------------------------------------------------------------------------
+const compose = (fn, fn2) => fn(fn2)
+
 const toSpanish = () => ({
     sProcessing: "Procesando...",
     sLengthMenu: "Mostrar _MENU_ registros",
@@ -316,5 +404,8 @@ const toSpanish = () => ({
     oAria: {
         sSortAscending: ": Activar para ordenar la columna de manera ascendente",
         sSortDescending: ": Activar para ordenar la columna de manera descendente"
+    },
+    select: {
+        rows: "<div style='float: right'><b>%d</b> elementos seleccionados</div>"
     }
 })
