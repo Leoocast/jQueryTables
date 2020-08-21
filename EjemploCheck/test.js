@@ -1,0 +1,3 @@
+function test(){
+    check.hola()
+}

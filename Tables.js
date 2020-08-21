@@ -13,6 +13,7 @@ export class Table {
         this._data = []
 
         this._dataChange = true
+        this._isCreated = false
 
         this._createRoot(data, config, create)
     }
@@ -91,21 +92,11 @@ export class Table {
 
     template(index, action){
 
-        const columns = []
+        const columns = this._configColumn(index, action)
 
-        this._data[0].forEach((item, i) => {
-
-            if(i !== index)
-                columns.push({ data: i })
-            else
-                columns.push({ 
-                            data: i, 
-                            render: action,
-                            sortable: false    
-                        })
-        })
-
-        this.destroy()
+        if(this._isCreated)
+            this.destroy()
+        
         this._createRoot(this._data, {columns: columns }, true)
         this._adjust()
     }
@@ -139,6 +130,24 @@ export class Table {
             else
                 this.create()
 
+    }
+
+    _configColumn(index, action){
+        const columns = []
+
+        this._data[0].forEach((item, i) => {
+
+            if(i !== index)
+                columns.push({ data: i })
+            else
+                columns.push({ 
+                            data: i, 
+                            render: action,
+                            sortable: false    
+                        })
+        })
+
+        return columns
     }
 
     _fix(){
@@ -214,8 +223,41 @@ export class Table {
 
 export class TableCheck extends Table {
     constructor(id, data = null, config = null, create = true){
-        super(id, data, config, create)
+        super(id, data, config, false)
+        
+        const checkConfig = this._getCheckConfig()
+
+        this._config = Object.assign(this._config, checkConfig)
+
+        if(create)
+            this.create()
+
     }
+
+    _getCheckConfig(){
+        const checkColum = this._configColumn(0, () => '')
+
+        const checkMultiple = this._config.multiple === undefined ? true : this._config.multiple
+
+        const checkConfig = {
+            columns: checkColum,
+            columnDefs : [
+                {
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets:   0,
+                }
+            ],
+            select: {
+                style:    checkMultiple ? '' : 'os',
+                selector: 'td:first-child'
+            },
+            order: [[ 0, 'asc' ]]
+        }
+
+        return checkConfig
+    }
+
 
 
 
@@ -228,7 +270,7 @@ function getConfig(data, config){
         scrollY: '300px',
         scrollCollapse: false,
         bSort: true,
-        scrollX: true,
+        // scrollX: true,
         paging: false,
         language: toSpanish(),
         deferRender: true,

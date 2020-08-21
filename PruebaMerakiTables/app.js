@@ -3,6 +3,7 @@ import { Table } from '../Tables.js'
 
 const caller = new Request();
 
+//Normal table
 (async function(){
     const data = await caller.fetchGET('https://jsonplaceholder.typicode.com/posts')
     
@@ -16,3 +17,6 @@ const caller = new Request();
 
     const table2 = new Table('table2', test12k, { scrollY: 300, delegateTask: true})
 })()
+
+
+//Check table
