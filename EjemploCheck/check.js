@@ -15,7 +15,7 @@ const config = {
     onSelectRow: row => { tableSelected.add(row)},
     onDeselectRow: row => { tableSelected.removeById(row[0])},
     scrollCollapse: false,
-    scrollY: 230,
+    scrollY: 230
 }
 
 const table = new TableCheck('table', data, config)

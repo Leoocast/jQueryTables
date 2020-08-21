@@ -330,21 +330,19 @@ export class TableCheck extends Table {
 
     //Pasar esto a vanilla js
     _eventRowClick({ onSelectRow, onDeselectRow }, dataById){
-        $(this.id + ' tbody').on( 'click', 'tr td:first-child', function () {
-            const input = this.parentElement.children[0].children[0]
-            const id = input.value
-            const selected = input.dataset.selected
-            console.log(selected, id)
-            const data = dataById(parseInt(id))
+        [...document.getElementById(this.id).querySelectorAll('tr td:first-child')].map( r => {
+            r.addEventListener('click', () => {
+                const input = r.parentElement.children[0].children[0]
+                const id = input.value
+                const data = dataById(parseInt(id))
 
-            console.log(data)
-
-            setTimeout(() => {
-                if(this.parentElement.classList.contains('selected'))
-                    onSelectRow(data)
-                else
-                    onDeselectRow(data)
-            }, 0);
+                setTimeout(() => {
+                    if(r.parentElement.classList.contains('selected'))
+                        onSelectRow(data)
+                    else
+                        onDeselectRow(data)
+                }, 0);
+            })
         })
     }
 }
