@@ -199,8 +199,9 @@ export class Table {
         this._source.rows().every(function(x){
             const data = this.node();
 
-            if(fn(data))
-                rows.push(data)
+            if(data !== null)
+                if(fn(data))
+                    rows.push(data)
         })
 
         return rows
@@ -306,6 +307,8 @@ export class TableCheck extends Table {
     //<-------- Private --------->
     _getCheckConfig(){
         const checkColum = this._configColumn(0, (id) => `<input data-selected="false" hidden value="${id}">`)
+
+
 
         const checkMultiple = this._config.multiple === undefined ? true : this._config.multiple
 
