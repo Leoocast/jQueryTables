@@ -101,6 +101,13 @@ export class Table {
         }
     }
 
+    setFilter(fn){
+        
+        const filteredData = this._data.filter(r => fn(r))
+
+        this._refreshFilter(filteredData)
+    }
+
     template(index, action){
         const columns = this._configColumn(index, action)
 
@@ -216,6 +223,12 @@ export class Table {
         this._source.rows.add(this._data)
         this._adjust()
     }
+
+    _refreshFilter(data){
+        this._source.clear()
+        this._source.rows.add(data)
+        this._adjust()
+    }
     
     //Hay que ver como se desenvuelve esto y a partir de ahí
     //buscar otra alternativa o quedarse con esta solución.
@@ -295,7 +308,7 @@ export class TableSelect extends Table {
     }
 
     selectedIds(){
-        return Array.from(this._source.rows({ selected: true }).data().map(r => r[0]))
+        return this.selectedData().map(r => r[0])
     }
 
     selectedRows(){
@@ -349,7 +362,6 @@ export class TableSelect extends Table {
 
                 setTimeout(() => {
                     if(row.classList.contains('selected')){
-                        console.log("Si ento acá")
                         onSelectRow(data)
                     }
                     else
