@@ -1,4 +1,4 @@
-import { TableCheck, Table } from '../Tables.js'
+import { TableSelect, Table } from '../Tables.js'
 import { Request } from '../PruebaMerakiTables/request.js'
 
 const caller = new Request();
@@ -15,27 +15,20 @@ const caller = new Request();
         [6, 'Javier', 'Chimeo', 23, 4],
     ]
 
-    const data = await caller.fetchGET('https://jsonplaceholder.typicode.com/photos')
-    
-    const dataTable = data.map(r => Object.values(r)).map(x => [x[1], x[2], x[3], x[4]])
-
-    const test20 = [...dataTable, ...dataTable, ...dataTable, ...dataTable ]
-    
     const tableSelected = new Table('tableSelected', [], { scrollCollapse : false, scrollY: "75vh"})
-    
-    const dataNulos = dataTable.filter(r => r == null)
-    
-    console.log(dataNulos, dataNulos.length);
 
     const config = {
-        onSelectRow: row => { tableSelected.add(row) },
+        onSelectRow: row => { tableSelected.add(row); console.log(row)},
         onDeselectRow: row => { tableSelected.removeById(row[0])},
+        // onSelectRow: row => { tableSelected.clear(); tableSelected.add(row);},
         scrollCollapse: false,
-        scrollY: "75vh"
+        scrollY: "75vh",
+        hasCheckbox: true,
+        multiple: true
+        // scrollX: true
     }
     
-    
-    const table = new TableCheck('table', dataTable, config)
+    const table = new TableSelect('table', dataEstatica, config)
     
     document.querySelector('#checkSelected').addEventListener('click', () =>{
         const selectedData = table.selectedData()
@@ -56,8 +49,4 @@ const caller = new Request();
         console.log("Removed data: ", removedData)
         console.log("Remanent data: ", table.data())
     })
-    
-    
 })()
-
-

@@ -21,7 +21,13 @@ export class Table {
     add(data){
         this._setData(data)
         this._addRows(data)
+        this._fix()
     }
+    
+    clear(){
+        this._source.clear()
+    }
+    
     create(){
         this._source = this.$element.DataTable(this._config)
         this._isCreated = true
@@ -96,7 +102,6 @@ export class Table {
     }
 
     template(index, action){
-
         const columns = this._configColumn(index, action)
 
         if(this._isCreated)
@@ -119,7 +124,6 @@ export class Table {
     }
 
     _createRoot(data, config, create){
-
         if(data === null)
             this._data = getHtmlData(this.element)
         else
@@ -260,11 +264,11 @@ export class Table {
     }
 }
 
-export class TableCheck extends Table {
+export class TableSelect extends Table {
     constructor(id, data = null, config = null, create = true){
         super(id, data, config, false)
         
-        const checkConfig = this._getCheckConfig()
+        const checkConfig = this._getCheckConfig(config.isCheckbox)
 
         this._config = Object.assign(this._config, checkConfig)
 
@@ -308,9 +312,9 @@ export class TableCheck extends Table {
     _getCheckConfig(){
         const checkColum = this._configColumn(0, (id) => `<input data-selected="false" hidden value="${id}">`)
 
-
-
         const checkMultiple = this._config.multiple === undefined ? true : this._config.multiple
+
+        const hasCheck = this._config.hasCheckbox === undefined ? true : this._config.hasCheckbox
 
         const checkConfig = {
             columns: checkColum,
@@ -319,11 +323,12 @@ export class TableCheck extends Table {
                     orderable: false,
                     className: 'select-checkbox',
                     targets:   0,
+                    visible: hasCheck
                 }
             ],
             select: {
                 style:    checkMultiple ? '' : 'os',
-                selector: 'td:first-child'
+                selector: hasCheck ? 'tr td:first-child' : 'tr'
             },
             order: [[ 0, 'asc' ]]
         }
@@ -332,16 +337,21 @@ export class TableCheck extends Table {
     }
 
     //Pasar esto a vanilla js
-    _eventRowClick({ onSelectRow, onDeselectRow }, dataById){
-        [...document.getElementById(this.id).querySelectorAll('tr td:first-child')].map( r => {
+    _eventRowClick({ onSelectRow, onDeselectRow, hasCheckbox }, dataById){
+
+        const selector = hasCheckbox ? 'tr td:first-child' : 'tr'
+
+        ;[...document.getElementById(this.id).querySelectorAll(selector)].map( r => {
             r.addEventListener('click', () => {
-                const input = r.parentElement.children[0].children[0]
-                const id = input.value
-                const data = dataById(parseInt(id))
+
+                const row =  hasCheckbox ? r.parentElement :  r
+                const data = this._source.row(row).data()
 
                 setTimeout(() => {
-                    if(r.parentElement.classList.contains('selected'))
+                    if(row.classList.contains('selected')){
+                        console.log("Si ento acá")
                         onSelectRow(data)
+                    }
                     else
                         onDeselectRow(data)
                 }, 0);
