@@ -278,9 +278,11 @@ export class TableSelect extends Table {
     constructor(id, data = null, config = null, create = true){
         super(id, data, config, false)
         
-        const checkConfig = this._getCheckConfig(config.isCheckbox)
+        const checkConfig = this._getCheckConfig()
 
         this._config = Object.assign(this._config, checkConfig)
+
+        console.log(this._config)
 
         if(create)
             this.create()
