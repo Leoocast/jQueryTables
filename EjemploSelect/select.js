@@ -11,7 +11,11 @@ import { Request } from '../PruebaMerakiTables/request.js'
         [6, 'Javier', 'Chimeo', 23],
     ]
 
-    const tableSelected = new Table('tableSelected', [], { scrollCollapse : false, scrollY: "75vh"})
+    const tableSelectedConfig = {
+        scrollCollapse : false, 
+        scrollY: "75vh"
+    }
+    const tableSelected = new Table('tableSelected', [], tableSelectedConfig)
 
     const config = {
         onSelectRow: row => { tableSelected.add(row) },
