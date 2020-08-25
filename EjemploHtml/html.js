@@ -2,4 +2,11 @@ import { Table } from '../Tables.js'
 
 const table = new Table('table')
 
-table.add(['Alma', 'Marcela', 5])
+setTimeout(() => {
+    table.setFilter(r => r[2] == 94)
+}, 2000)
+
+
+setTimeout(() => {
+    table.reset()
+}, 5000)

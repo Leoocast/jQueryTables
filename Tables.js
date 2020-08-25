@@ -79,6 +79,10 @@ export class Table {
         this._removeByRow(row, id)
     }
 
+    reset(){
+        this._refresh(this._data)
+    }
+
     rows(){
         const rows = this._getRows()
         return rows
@@ -102,10 +106,9 @@ export class Table {
     }
 
     setFilter(fn){
-        
         const filteredData = this._data.filter(r => fn(r))
 
-        this._refreshFilter(filteredData)
+        this._refresh(filteredData)
     }
 
     template(index, action){
@@ -218,13 +221,7 @@ export class Table {
         return rows
     }
     
-    _refresh(){
-        this._source.clear()
-        this._source.rows.add(this._data)
-        this._adjust()
-    }
-
-    _refreshFilter(data){
+    _refresh(data){
         this._source.clear()
         this._source.rows.add(data)
         this._adjust()
@@ -290,6 +287,10 @@ export class TableSelect extends Table {
 
         this._eventRowClick(this._config, this.dataById.bind(this))
 
+    }
+
+    clearSelected(){
+        this._source.rows('.selected').deselect()
     }
 
     removeSelectedRows(){
