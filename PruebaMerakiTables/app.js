@@ -5,7 +5,7 @@ const caller = new Request();
 
 //Normal table
 (async function(){
-    const data = await caller.fetchGET('https://jsonplaceholder.typicode.com/posts')
+    const data = await caller.fetchGET('https://jsonplaceholder.typicode.com/posts').catch(r => r.consoleError())
     
     const dataTable = data.map(r => Object.values(r))
 

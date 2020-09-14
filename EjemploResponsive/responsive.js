@@ -1,4 +1,4 @@
-import { Table, TableSelect } from '../Tables.js' 
+import { Table } from '../Tables.js' 
 
 const table = new Table('table', null, { scrollY: 550 })
 
